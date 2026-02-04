@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Application Models
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  decks         Deck[]
+  documents     Document[]
+  chatSessions  ChatSession[]
+  cardReviews   CardReview[]
+  studyStreak   StudyStreak?
+}
+
+model Document {
+  id            String           @id @default(cuid())
+  userId        String
+  title         String
+  type          DocumentType     @default(IMAGE)
+  originalUrl   String?
+  extractedText String?          @db.Text
+  status        ProcessingStatus @default(PENDING)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flashcards Flashcard[]
+  summaries  Summary[]
+}
+
+model Deck {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  color       String   @default("#6366f1")
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flashcards Flashcard[]
+}
+
+model Flashcard {
+  id          String   @id @default(cuid())
+  deckId      String
+  documentId  String?
+  front       String   @db.Text
+  back        String   @db.Text
+  difficulty  Int      @default(0)
+  aiGenerated Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  deck     Deck         @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  document Document?    @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  reviews  CardReview[]
+}
+
+model CardReview {
+  id          String   @id @default(cuid())
+  flashcardId String
+  userId      String
+  rating      Int
+  interval    Int      @default(1)
+  easeFactor  Float    @default(2.5)
+  nextReview  DateTime
+  reviewedAt  DateTime @default(now())
+
+  flashcard Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, nextReview])
+}
+
+model ChatSession {
+  id         String   @id @default(cuid())
+  userId     String
+  title      String?
+  documentId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  role      Role
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Summary {
+  id         String      @id @default(cuid())
+  documentId String
+  content    String      @db.Text
+  type       SummaryType @default(DETAILED)
+  createdAt  DateTime    @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+model StudyStreak {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  currentStreak Int      @default(0)
+  longestStreak Int      @default(0)
+  lastStudyDate DateTime?
+  totalCards    Int      @default(0)
+  totalMinutes  Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Enums
+enum DocumentType {
+  IMAGE
+  PDF
+  TEXT
+}
+
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum Role {
+  USER
+  ASSISTANT
+}
+
+enum SummaryType {
+  BRIEF
+  DETAILED
+  BULLET_POINTS
+}

@@ -83,53 +83,60 @@ This file provides comprehensive guidance for AI assistants working with the Stu
 studysimple-app/
 ├── CLAUDE.md                    # AI assistant guidelines (this file)
 ├── README.md                    # Project documentation
-├── package.json                 # Root package configuration
-├── turbo.json                   # Turborepo configuration
+├── package.json                 # Dependencies and scripts
+├── tsconfig.json                # TypeScript configuration
+├── next.config.js               # Next.js configuration
+├── tailwind.config.ts           # Tailwind CSS configuration
+├── middleware.ts                # Auth middleware
 ├── .env.example                 # Environment variables template
 ├── .gitignore                   # Git ignore rules
 │
-├── apps/
-│   ├── web/                     # Next.js web application
-│   │   ├── app/                 # App Router pages
-│   │   │   ├── (auth)/          # Auth routes (login, register)
-│   │   │   ├── (dashboard)/     # Protected dashboard routes
-│   │   │   ├── api/             # API routes
-│   │   │   └── layout.tsx       # Root layout
-│   │   ├── components/          # Web-specific components
-│   │   ├── lib/                 # Utilities and helpers
-│   │   └── package.json
-│   │
-│   └── mobile/                  # React Native + Expo app
-│       ├── app/                 # Expo Router screens
-│       ├── components/          # Mobile components
-│       └── package.json
+├── app/                         # Next.js App Router
+│   ├── layout.tsx               # Root layout
+│   ├── page.tsx                 # Landing page
+│   ├── globals.css              # Global styles
+│   ├── login/                   # Login page
+│   │   └── page.tsx
+│   ├── (dashboard)/             # Protected dashboard routes
+│   │   ├── layout.tsx           # Dashboard layout with sidebar
+│   │   ├── dashboard/           # Main dashboard
+│   │   ├── decks/               # Deck management
+│   │   │   ├── page.tsx         # Deck list
+│   │   │   └── [id]/            # Single deck view
+│   │   ├── study/               # Study session
+│   │   ├── chat/                # AI tutor chat
+│   │   └── import/              # Content import with OCR
+│   └── api/                     # API routes
+│       ├── auth/                # NextAuth handlers
+│       ├── decks/               # Deck CRUD
+│       ├── flashcards/          # Flashcard CRUD
+│       ├── study/               # Study session & reviews
+│       ├── ai/                  # AI generation endpoints
+│       └── chat/                # Chat sessions
 │
-├── packages/
-│   ├── ui/                      # Shared UI components
-│   │   ├── components/          # Reusable components
-│   │   └── package.json
-│   │
-│   ├── database/                # Prisma schema & client
-│   │   ├── prisma/
-│   │   │   ├── schema.prisma    # Database schema
-│   │   │   └── migrations/      # Database migrations
-│   │   └── package.json
-│   │
-│   ├── ai/                      # AI service integrations
-│   │   ├── ocr/                 # OCR processing
-│   │   ├── llm/                 # LLM integrations
-│   │   └── package.json
-│   │
-│   └── shared/                  # Shared utilities & types
-│       ├── types/               # TypeScript definitions
-│       ├── utils/               # Utility functions
-│       └── package.json
+├── components/                  # React components
+│   ├── ui/                      # Base UI components (shadcn/ui)
+│   ├── dashboard/               # Dashboard components
+│   ├── flashcards/              # Flashcard components
+│   ├── chat/                    # Chat interface
+│   └── import/                  # Import interface
 │
-├── docs/                        # Documentation
-│   ├── api/                     # API documentation
-│   └── architecture/            # Architecture decisions
+├── lib/                         # Utilities and configurations
+│   ├── db.ts                    # Prisma client
+│   ├── auth.ts                  # NextAuth configuration
+│   ├── ai.ts                    # OpenAI integration
+│   ├── spaced-repetition.ts     # SM-2 algorithm
+│   └── utils.ts                 # Helper functions
 │
-└── scripts/                     # Build & utility scripts
+├── prisma/                      # Database
+│   └── schema.prisma            # Prisma schema
+│
+├── hooks/                       # Custom React hooks
+│   ├── use-store.ts             # Zustand store
+│   └── use-toast.ts             # Toast notifications
+│
+└── types/                       # TypeScript definitions
+    └── index.ts
 ```
 
 ## Database Schema
