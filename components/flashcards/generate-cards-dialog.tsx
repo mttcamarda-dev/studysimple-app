@@ -70,10 +70,10 @@ export function GenerateCardsDialog({ deckId, children }: GenerateCardsDialogPro
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Genera Flashcard con AI
+              Genera Flashcard Automaticamente
             </DialogTitle>
             <DialogDescription>
-              Incolla il testo dei tuoi appunti e l&apos;AI generera automaticamente
+              Incolla il testo dei tuoi appunti e verranno generate automaticamente
               le flashcard
             </DialogDescription>
           </DialogHeader>

@@ -17,7 +17,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "I Miei Mazzi", href: "/decks", icon: BookOpen },
   { name: "Studia", href: "/study", icon: GraduationCap },
-  { name: "Tutor AI", href: "/chat", icon: MessageSquare },
+  { name: "Assistente", href: "/chat", icon: MessageSquare },
   { name: "Importa", href: "/import", icon: Upload },
 ];
 

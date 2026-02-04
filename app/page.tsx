@@ -40,7 +40,7 @@ export default function LandingPage() {
             <span className="text-primary">intelligente</span>
           </h1>
           <p className="mt-6 text-xl text-muted-foreground">
-            Trasforma i tuoi appunti in flashcard, riassunti e quiz con l&apos;AI.
+            Trasforma i tuoi appunti in flashcard, riassunti e quiz in pochi secondi.
             Memorizza meglio con la ripetizione spaziata.
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
@@ -64,8 +64,8 @@ export default function LandingPage() {
           Tutto cio che ti serve per studiare
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
-          StudySimple combina le migliori tecniche di apprendimento con l&apos;intelligenza
-          artificiale per aiutarti a studiare meglio.
+          StudySimple combina le migliori tecniche di apprendimento per
+          aiutarti a studiare meglio e piu velocemente.
         </p>
 
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -87,10 +87,10 @@ export default function LandingPage() {
               <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3">
                 <Sparkles className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">Flashcard con AI</h3>
+              <h3 className="text-xl font-semibold">Generazione Automatica</h3>
               <p className="mt-2 text-muted-foreground">
-                L&apos;AI genera automaticamente flashcard, riassunti e quiz dai tuoi
-                contenuti.
+                Genera automaticamente flashcard, riassunti e quiz dai tuoi
+                contenuti in pochi secondi.
               </p>
             </CardContent>
           </Card>
@@ -113,9 +113,9 @@ export default function LandingPage() {
               <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3">
                 <MessageSquare className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">Tutor AI</h3>
+              <h3 className="text-xl font-semibold">Assistente Studio</h3>
               <p className="mt-2 text-muted-foreground">
-                Chiedi spiegazioni al tutor AI. Ti aiuta a capire meglio qualsiasi
+                Chiedi spiegazioni all&apos;assistente. Ti aiuta a capire meglio qualsiasi
                 argomento.
               </p>
             </CardContent>
@@ -142,7 +142,7 @@ export default function LandingPage() {
               <h3 className="text-xl font-semibold">Quiz Interattivi</h3>
               <p className="mt-2 text-muted-foreground">
                 Metti alla prova le tue conoscenze con quiz generati
-                automaticamente dall&apos;AI.
+                automaticamente dai tuoi contenuti.
               </p>
             </CardContent>
           </Card>

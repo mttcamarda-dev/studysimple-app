@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "StudySimple - Studia in modo intelligente",
-  description: "App per lo studio intelligente con AI, flashcard e ripetizione spaziata",
+  description: "App per lo studio intelligente con flashcard e ripetizione spaziata",
 };
 
 export default function RootLayout({

@@ -144,7 +144,7 @@ export function ImportInterface({ decks }: ImportInterfaceProps) {
       <div>
         <h1 className="text-3xl font-bold">Importa Contenuti</h1>
         <p className="text-muted-foreground">
-          Carica immagini o incolla testo per generare flashcard e riassunti con l&apos;AI
+          Carica immagini o incolla testo per generare flashcard e riassunti automaticamente
         </p>
       </div>
 
@@ -253,7 +253,7 @@ export function ImportInterface({ decks }: ImportInterfaceProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Genera con AI
+              Genera Contenuti
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">

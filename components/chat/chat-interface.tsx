@@ -167,10 +167,10 @@ export function ChatInterface({ initialSessions }: ChatInterfaceProps) {
             <div className="rounded-full bg-primary/10 p-6 mb-6">
               <Brain className="h-12 w-12 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold mb-2">Tutor AI</h2>
+            <h2 className="text-2xl font-bold mb-2">Assistente Studio</h2>
             <p className="text-muted-foreground max-w-md mb-6">
-              Ciao! Sono il tuo tutor AI. Posso aiutarti a capire meglio
-              qualsiasi argomento di studio. Fammi una domanda!
+              Ciao! Posso aiutarti a capire meglio qualsiasi argomento
+              di studio. Fammi una domanda!
             </p>
             <div className="grid gap-2 w-full max-w-md">
               {[

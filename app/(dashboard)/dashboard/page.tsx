@@ -137,7 +137,7 @@ export default async function DashboardPage() {
             </div>
             <h3 className="font-semibold mb-2">Importa Contenuti</h3>
             <p className="text-sm text-muted-foreground text-center mb-4">
-              Carica immagini e genera flashcard con AI
+              Carica immagini e genera flashcard automaticamente
             </p>
             <Link href="/import">
               <Button variant="outline">Importa</Button>
@@ -150,9 +150,9 @@ export default async function DashboardPage() {
             <div className="rounded-full bg-primary/10 p-4 mb-4">
               <MessageSquare className="h-8 w-8 text-primary" />
             </div>
-            <h3 className="font-semibold mb-2">Chiedi al Tutor</h3>
+            <h3 className="font-semibold mb-2">Chiedi Aiuto</h3>
             <p className="text-sm text-muted-foreground text-center mb-4">
-              Fai domande al tutor AI
+              Fai domande e ricevi spiegazioni
             </p>
             <Link href="/chat">
               <Button variant="outline">Inizia Chat</Button>

@@ -78,7 +78,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
         <GenerateCardsDialog deckId={deck.id}>
           <Button variant="outline" className="gap-2">
             <Sparkles className="h-4 w-4" />
-            Genera con AI
+            Genera Automaticamente
           </Button>
         </GenerateCardsDialog>
       </div>
@@ -92,7 +92,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
             </div>
             <h3 className="text-xl font-semibold mb-2">Nessuna carta ancora</h3>
             <p className="text-muted-foreground text-center mb-4">
-              Aggiungi flashcard manualmente o generale con l&apos;AI
+              Aggiungi flashcard manualmente o generale automaticamente
             </p>
             <div className="flex gap-3">
               <CreateCardDialog deckId={deck.id}>
@@ -101,7 +101,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
               <GenerateCardsDialog deckId={deck.id}>
                 <Button variant="outline" className="gap-2">
                   <Sparkles className="h-4 w-4" />
-                  Genera con AI
+                  Genera Automaticamente
                 </Button>
               </GenerateCardsDialog>
             </div>
