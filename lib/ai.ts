@@ -1,55 +1,43 @@
-// Google Gemini AI Integration (FREE!)
-// Get your free API key at: https://makersuite.google.com/app/apikey
+// Hugging Face Inference API Integration (FREE!)
 
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+const HF_API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
 
-async function callGemini(prompt: string, systemPrompt?: string): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY;
+async function callHuggingFace(prompt: string): Promise<string> {
+  const apiKey = process.env.HUGGINGFACE_API_KEY;
 
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY not configured");
+    throw new Error("HUGGINGFACE_API_KEY not configured");
   }
 
-  const contents = [];
-
-  if (systemPrompt) {
-    contents.push({
-      role: "user",
-      parts: [{ text: systemPrompt }]
-    });
-    contents.push({
-      role: "model",
-      parts: [{ text: "Capito, seguirò queste istruzioni." }]
-    });
-  }
-
-  contents.push({
-    role: "user",
-    parts: [{ text: prompt }]
-  });
-
-  const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+  const response = await fetch(HF_API_URL, {
     method: "POST",
     headers: {
+      "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      contents,
-      generationConfig: {
+      inputs: prompt,
+      parameters: {
+        max_new_tokens: 2048,
         temperature: 0.7,
-        maxOutputTokens: 2048,
+        return_full_text: false,
       },
     }),
   });
 
   if (!response.ok) {
     const error = await response.text();
-    console.error("Gemini API error:", error);
-    throw new Error(`Gemini API error: ${response.status}`);
+    console.error("HuggingFace API error:", error);
+    throw new Error(`HuggingFace API error: ${response.status}`);
   }
 
   const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+  if (Array.isArray(data) && data[0]?.generated_text) {
+    return data[0].generated_text;
+  }
+
+  return data.generated_text || "";
 }
 
 export interface GeneratedFlashcard {
@@ -61,17 +49,18 @@ export async function generateFlashcards(
   text: string,
   count: number = 5
 ): Promise<GeneratedFlashcard[]> {
-  const systemPrompt = `Sei un assistente educativo esperto. Genera ${count} flashcard dal testo fornito.
-Ogni flashcard deve avere una domanda chiara (front) e una risposta concisa ma completa (back).
-Rispondi SOLO con un array JSON valido nel formato:
-[{"front": "domanda", "back": "risposta"}]
-Non includere altro testo, markdown o spiegazioni. Solo il JSON puro.`;
+  const prompt = `<s>[INST] Sei un assistente educativo. Genera esattamente ${count} flashcard dal testo seguente.
+Rispondi SOLO con un array JSON valido, senza altro testo.
+Formato: [{"front": "domanda", "back": "risposta"}]
 
-  const content = await callGemini(text, systemPrompt);
+Testo: ${text.slice(0, 3000)}
+
+JSON: [/INST]`;
+
+  const content = await callHuggingFace(prompt);
 
   try {
-    // Try to extract JSON from the response
-    const jsonMatch = content.match(/\[[\s\S]*\]/);
+    const jsonMatch = content.match(/\[[\s\S]*?\]/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     }
@@ -87,54 +76,53 @@ export async function generateSummary(
   type: "brief" | "detailed" | "bullet_points" = "detailed"
 ): Promise<string> {
   const prompts = {
-    brief: "Crea un riassunto breve (2-3 frasi) del seguente testo:",
-    detailed: "Crea un riassunto dettagliato e ben strutturato del seguente testo:",
-    bullet_points: "Crea un riassunto in punti elenco del seguente testo:",
+    brief: "Crea un riassunto breve (2-3 frasi) in italiano del seguente testo:",
+    detailed: "Crea un riassunto dettagliato e ben strutturato in italiano del seguente testo:",
+    bullet_points: "Crea un riassunto in punti elenco in italiano del seguente testo:",
   };
 
-  const systemPrompt = "Sei un assistente educativo esperto nel creare riassunti chiari e utili per lo studio. Rispondi sempre in italiano.";
+  const prompt = `<s>[INST] ${prompts[type]}
 
-  return await callGemini(`${prompts[type]}\n\n${text}`, systemPrompt);
+${text.slice(0, 3000)} [/INST]`;
+
+  return await callHuggingFace(prompt);
 }
 
 export async function chatWithTutor(
   messages: { role: "user" | "assistant"; content: string }[],
   context?: string
 ): Promise<string> {
-  const systemPrompt = context
-    ? `Sei un tutor AI amichevole e paziente. Aiuti gli studenti a comprendere meglio i loro materiali di studio.
-Contesto dello studio dell'utente:
-${context}
+  const systemContext = context
+    ? `Sei un tutor amichevole che aiuta gli studenti. Contesto: ${context}`
+    : "Sei un tutor amichevole che aiuta gli studenti con qualsiasi argomento.";
 
-Rispondi sempre in italiano, spiega i concetti passo-passo e usa esempi quando possibile.`
-    : `Sei un tutor AI amichevole e paziente. Aiuti gli studenti con qualsiasi argomento di studio.
-Rispondi sempre in italiano, spiega i concetti passo-passo e usa esempi quando possibile.`;
+  const lastMessage = messages[messages.length - 1]?.content || "";
 
-  // Build conversation history
-  const conversationText = messages
-    .map((m) => `${m.role === "user" ? "Studente" : "Tutor"}: ${m.content}`)
-    .join("\n\n");
+  const prompt = `<s>[INST] ${systemContext}
 
-  const prompt = `Questa è la conversazione finora:\n\n${conversationText}\n\nRispondi come Tutor all'ultimo messaggio dello studente.`;
+Rispondi in italiano in modo chiaro e utile.
 
-  return await callGemini(prompt, systemPrompt);
+Domanda dello studente: ${lastMessage} [/INST]`;
+
+  return await callHuggingFace(prompt);
 }
 
 export async function generateQuiz(
   text: string,
   questionCount: number = 5
 ): Promise<{ question: string; options: string[]; correctIndex: number }[]> {
-  const systemPrompt = `Genera ${questionCount} domande a scelta multipla dal testo fornito.
-Ogni domanda deve avere 4 opzioni con una sola risposta corretta.
-Rispondi SOLO con un array JSON nel formato:
-[{"question": "domanda", "options": ["a", "b", "c", "d"], "correctIndex": 0}]
-correctIndex è l'indice (0-3) della risposta corretta.
-Non includere altro testo, markdown o spiegazioni. Solo il JSON puro.`;
+  const prompt = `<s>[INST] Genera ${questionCount} domande a scelta multipla dal testo.
+Rispondi SOLO con un array JSON, senza altro testo.
+Formato: [{"question": "domanda", "options": ["a", "b", "c", "d"], "correctIndex": 0}]
 
-  const content = await callGemini(text, systemPrompt);
+Testo: ${text.slice(0, 3000)}
+
+JSON: [/INST]`;
+
+  const content = await callHuggingFace(prompt);
 
   try {
-    const jsonMatch = content.match(/\[[\s\S]*\]/);
+    const jsonMatch = content.match(/\[[\s\S]*?\]/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     }
