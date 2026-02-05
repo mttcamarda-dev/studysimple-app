@@ -1,11 +1,13 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { db } from "@/lib/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.AUTH_SECRET || "fallback-secret-key-for-development-only-32chars",
   session: { strategy: "jwt" },
+  trustHost: true,
   pages: {
     signIn: "/login",
+    error: "/login",
   },
   providers: [
     Credentials({
@@ -18,40 +20,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const email = credentials.email as string;
 
-        try {
-          // Find or create demo user
-          let user = await db.user.findUnique({
-            where: { email },
-          });
-
-          if (!user) {
-            user = await db.user.create({
-              data: {
-                email,
-                name: email.split("@")[0],
-              },
-            });
-
-            // Create initial study streak
-            await db.studyStreak.create({
-              data: { userId: user.id },
-            });
-          }
-
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-          };
-        } catch (error) {
-          console.error("Auth error:", error);
-          // Fallback: return a temporary user without DB
-          return {
-            id: email,
-            email: email,
-            name: email.split("@")[0],
-          };
-        }
+        // Simple demo auth - no database needed
+        return {
+          id: email.replace(/[^a-zA-Z0-9]/g, "_"),
+          email: email,
+          name: email.split("@")[0],
+        };
       },
     }),
   ],
@@ -60,11 +34,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }
+      if (token.email && session.user) {
+        session.user.email = token.email as string;
+      }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
+        token.email = user.email;
       }
       return token;
     },
