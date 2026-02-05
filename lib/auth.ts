@@ -1,20 +1,13 @@
 import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { db } from "@/lib/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
   },
   providers: [
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-    }),
     Credentials({
       name: "Demo",
       credentials: {
@@ -25,26 +18,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const email = credentials.email as string;
 
-        // Find or create demo user
-        let user = await db.user.findUnique({
-          where: { email },
-        });
-
-        if (!user) {
-          user = await db.user.create({
-            data: {
-              email,
-              name: email.split("@")[0],
-            },
+        try {
+          // Find or create demo user
+          let user = await db.user.findUnique({
+            where: { email },
           });
 
-          // Create initial study streak
-          await db.studyStreak.create({
-            data: { userId: user.id },
-          });
+          if (!user) {
+            user = await db.user.create({
+              data: {
+                email,
+                name: email.split("@")[0],
+              },
+            });
+
+            // Create initial study streak
+            await db.studyStreak.create({
+              data: { userId: user.id },
+            });
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+          };
+        } catch (error) {
+          console.error("Auth error:", error);
+          // Fallback: return a temporary user without DB
+          return {
+            id: email,
+            email: email,
+            name: email.split("@")[0],
+          };
         }
-
-        return user;
       },
     }),
   ],
@@ -60,16 +67,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.sub = user.id;
       }
       return token;
-    },
-  },
-  events: {
-    async createUser({ user }) {
-      // Create study streak for new users
-      if (user.id) {
-        await db.studyStreak.create({
-          data: { userId: user.id },
-        });
-      }
     },
   },
 });
